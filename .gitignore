@@ -1,0 +1,5 @@
+__pycache__/
+.venv/
+.env
+ergebnis_20*.json
+!token-messung/ergebnis_2026-10-01.json

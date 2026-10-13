@@ -1,0 +1,205 @@
+{
+ "datum": "2026-10-01",
+ "api": "https://api.ragfeed.de",
+ "tokenizer": "o200k_base (tiktoken)",
+ "zusammenfassung": {
+  "seiten": 20,
+  "verglichen": "llmMarkdown",
+  "alle": {
+   "gegenHtml": 98,
+   "gegenGanzeSeite": 63
+  },
+  "startseiten": {
+   "gegenHtml": 99,
+   "gegenGanzeSeite": 64
+  },
+  "artikel": {
+   "gegenHtml": 98,
+   "gegenGanzeSeite": 59
+  },
+  "hauptinhaltGegenGanzeSeite": 51
+ },
+ "hinweis": "Veröffentlichte Momentaufnahme; Prozentwerte auf ganze Zahlen gerundet.",
+ "seiten": [
+  {
+   "name": "Wikipedia: Big Data",
+   "art": "Artikel",
+   "url": "https://de.wikipedia.org/wiki/Big_Data",
+   "html": 94483,
+   "ganzeSeite": 25259,
+   "hauptinhalt": 17142,
+   "llmMarkdown": 15713
+  },
+  {
+   "name": "Gesetzestext: § 44b UrhG",
+   "art": "Artikel",
+   "url": "https://www.gesetze-im-internet.de/urhg/__44b.html",
+   "html": 1265,
+   "ganzeSeite": 480,
+   "hauptinhalt": 368,
+   "llmMarkdown": 355
+  },
+  {
+   "name": "MDN-Doku: HTML",
+   "art": "Artikel",
+   "url": "https://developer.mozilla.org/de/docs/Web/HTML",
+   "html": 56651,
+   "ganzeSeite": 12837,
+   "hauptinhalt": 3017,
+   "llmMarkdown": 3280
+  },
+  {
+   "name": "Umweltbundesamt: Klimawandel",
+   "art": "Artikel",
+   "url": "https://www.umweltbundesamt.de/themen/klima-energie/klimawandel",
+   "html": 99713,
+   "ganzeSeite": 11347,
+   "hauptinhalt": 1289,
+   "llmMarkdown": 1337
+  },
+  {
+   "name": "tagesschau.de: Wirtschaft",
+   "art": "Startseite",
+   "url": "https://www.tagesschau.de/wirtschaft/",
+   "html": 478580,
+   "ganzeSeite": 12501,
+   "hauptinhalt": 7966,
+   "llmMarkdown": 5072
+  },
+  {
+   "name": "heise online: Startseite",
+   "art": "Startseite",
+   "url": "https://www.heise.de/",
+   "html": 359135,
+   "ganzeSeite": 29770,
+   "hauptinhalt": 20892,
+   "llmMarkdown": 16135
+  },
+  {
+   "name": "Siemens: Startseite",
+   "art": "Startseite",
+   "url": "https://www.siemens.com/de/de.html",
+   "html": 134748,
+   "ganzeSeite": 6449,
+   "hauptinhalt": 3311,
+   "llmMarkdown": 2059
+  },
+  {
+   "name": "DHL: Privatkunden",
+   "art": "Startseite",
+   "url": "https://www.dhl.de/de/privatkunden.html",
+   "html": 59085,
+   "ganzeSeite": 11416,
+   "hauptinhalt": 2821,
+   "llmMarkdown": 2155
+  },
+  {
+   "name": "Chefkoch: Startseite",
+   "art": "Startseite",
+   "url": "https://www.chefkoch.de/",
+   "html": 190842,
+   "ganzeSeite": 17018,
+   "hauptinhalt": 2655,
+   "llmMarkdown": 1645
+  },
+  {
+   "name": "Verbraucherzentrale: Startseite",
+   "art": "Startseite",
+   "url": "https://www.verbraucherzentrale.de/",
+   "html": 562566,
+   "ganzeSeite": 5573,
+   "hauptinhalt": 4092,
+   "llmMarkdown": 3608
+  },
+  {
+   "name": "tagesschau.de: Artikel Tanken",
+   "art": "Artikel",
+   "url": "https://www.tagesschau.de/wirtschaft/verbraucher/september-tanken-100.html",
+   "html": 261767,
+   "ganzeSeite": 7339,
+   "hauptinhalt": 2650,
+   "llmMarkdown": 1960
+  },
+  {
+   "name": "heise online: Meldung",
+   "art": "Artikel",
+   "url": "https://www.heise.de/news/Tapete-produziert-Strom-mit-Luftfeuchtigkeit-11470666.html",
+   "html": 91736,
+   "ganzeSeite": 5404,
+   "hauptinhalt": 1805,
+   "llmMarkdown": 1858
+  },
+  {
+   "name": "Verbraucherzentrale: Ratgeber",
+   "art": "Artikel",
+   "url": "https://www.verbraucherzentrale.de/wissen/lebensmittel/ernaehrung-fuer-seniorinnen/ernaehrungsberatung-gesucht-so-finden-sie-qualifizierte-hilfe-17735",
+   "html": 404544,
+   "ganzeSeite": 5952,
+   "hauptinhalt": 5238,
+   "llmMarkdown": 4902
+  },
+  {
+   "name": "Chefkoch: Rezept",
+   "art": "Artikel",
+   "url": "https://www.chefkoch.de/rezepte/3292561488882374/Preiswerter-einfacher-und-schneller-Bratreis.html",
+   "html": 140381,
+   "ganzeSeite": 4831,
+   "hauptinhalt": 3170,
+   "llmMarkdown": 2459
+  },
+  {
+   "name": "Umweltbundesamt: Treibhausgase",
+   "art": "Artikel",
+   "url": "https://www.umweltbundesamt.de/themen/klima-energie/treibhausgas-emissionen",
+   "html": 121354,
+   "ganzeSeite": 20064,
+   "hauptinhalt": 10541,
+   "llmMarkdown": 10354
+  },
+  {
+   "name": "DHL: Online frankieren",
+   "art": "Artikel",
+   "url": "https://www.dhl.de/de/privatkunden/pakete-versenden/online-frankieren.html",
+   "html": 114545,
+   "ganzeSeite": 10319,
+   "hauptinhalt": 1231,
+   "llmMarkdown": 1119
+  },
+  {
+   "name": "t-online: Artikel Wärmepumpe",
+   "art": "Artikel",
+   "url": "https://www.t-online.de/heim-garten/aktuelles/id_101097404/waermepumpe-foerderung-neue-grenzwerte-stoppen-zuschuss-vieler-modelle.html",
+   "html": 150606,
+   "ganzeSeite": 10486,
+   "hauptinhalt": 2949,
+   "llmMarkdown": 2616
+  },
+  {
+   "name": "n-tv: Ratgeber Wärmepumpe",
+   "art": "Artikel",
+   "url": "https://www.n-tv.de/energieeffizienz/waermepumpe/waermepumpe-kosten-foerderung",
+   "html": 119333,
+   "ganzeSeite": 18372,
+   "hauptinhalt": 8669,
+   "llmMarkdown": 8648
+  },
+  {
+   "name": "nord24: Artikel Wärmepumpe",
+   "art": "Artikel",
+   "url": "https://www.nord24.de/verbraucher/waermepumpe-foerderung-2026-wer-bis-zu-22400-euro-zuschuss-bekommt-414932.html",
+   "html": 27875,
+   "ganzeSeite": 7261,
+   "hauptinhalt": 5754,
+   "llmMarkdown": 5365
+  },
+  {
+   "name": "MSN: Artikel Wärmepumpe",
+   "art": "Artikel",
+   "url": "https://www.msn.com/de-de/finanzen/top-stories/w%C3%A4rmepumpe-f%C3%B6rderung-2026-zusch%C3%BCsse-kredite-und-steuerbonus/ar-AA1YIWmf",
+   "html": 244653,
+   "ganzeSeite": 20174,
+   "hauptinhalt": 4369,
+   "llmMarkdown": 4347
+  }
+ ]
+}
