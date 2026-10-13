@@ -8,7 +8,7 @@ Ruft 20 öffentliche Seiten über eine Firecrawl-kompatible API ab und zählt mi
 Ausgewertet wird der Median der Ersparnis je Seite, damit wenige riesige Portalseiten das Ergebnis nicht bestimmen.
 
     pip install -r requirements.txt
-    set RAGFEED_API_KEY=fc-...            (PowerShell: $env:RAGFEED_API_KEY="fc-...")
+    set RAGFEED_API_KEY=sk-...            (PowerShell: $env:RAGFEED_API_KEY="sk-...")
     python messung.py
 
 Andere Firecrawl-kompatible API vergleichen:  python messung.py --api https://... --key ... --ohne-llm

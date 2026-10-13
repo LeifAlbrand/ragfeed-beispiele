@@ -31,7 +31,7 @@ Selbst nachmessen (kostet bei Ragfeed 40 Credits; der kostenlose Plan hat 1.000 
 ```bash
 cd token-messung
 pip install -r requirements.txt
-RAGFEED_API_KEY=fc-IhrSchluessel python messung.py
+RAGFEED_API_KEY=sk-IhrSchluessel python messung.py
 ```
 
 Eine andere Firecrawl-kompatible API lässt sich ohne llmMarkdown genauso messen:
@@ -42,7 +42,7 @@ Eine andere Firecrawl-kompatible API lässt sich ohne llmMarkdown genauso messen
 ```python
 from firecrawl import Firecrawl
 
-app = Firecrawl(api_key="fc-IhrSchluessel", api_url="https://api.ragfeed.de")
+app = Firecrawl(api_key="sk-IhrSchluessel", api_url="https://api.ragfeed.de")
 doc = app.scrape("https://de.wikipedia.org/wiki/Big_Data", formats=["markdown"])
 ```
 

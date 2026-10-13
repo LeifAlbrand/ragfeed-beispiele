@@ -1,7 +1,7 @@
 """Bestehender Firecrawl-Code mit Ragfeed: nur api_url und Schlüssel ändern sich.
 
     pip install firecrawl-py httpx
-    set RAGFEED_API_KEY=fc-...            (PowerShell: $env:RAGFEED_API_KEY="fc-...")
+    set RAGFEED_API_KEY=sk-...            (PowerShell: $env:RAGFEED_API_KEY="sk-...")
     python beispiel.py
 """
 import os
