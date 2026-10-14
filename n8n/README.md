@@ -37,7 +37,7 @@ Zugangsdaten **Header Auth**:
 
 Jeder Chunk enthält:
 - `id`: feste UUID aus normalisierter Adresse und Position. Bei erneutem Abruf derselben Seite bekommt der Chunk an derselben Position dieselbe ID, Sie überschreiben also, statt Dubletten anzulegen.
-- `text` und `embedText` (Text mit Überschriftenpfad, zum Einbetten), `tokens`
+- `text` und `embedText` (der Text zum Einbetten; mit der Option `context` steht Titel oder Überschriftenpfad davor), `tokens`
 - `metadata`: Adresse, Titel, Überschrift, Sprache, Position, Abrufdatum und `hash` (ändert sich nur, wenn sich der Inhalt ändert)
 
 `maxTokens` (100 bis 4000, Standard 500) steuert die Chunk-Größe. Danach verbinden Sie den Ausgang mit Ihrem Embedding- und Vektordatenbank-Baustein (z. B. Qdrant, Pinecone, Postgres/pgvector).

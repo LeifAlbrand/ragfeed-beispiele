@@ -1,0 +1,178 @@
+{
+  "name": "Scrape web pages to LLM-ready Markdown with the Firecrawl node and Ragfeed",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "908106ac-ae79-47d4-aaeb-b6655c12bcb3",
+      "name": "Run manually",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        560,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c671d204-7fe0-4447-beb2-77a2be4a17df",
+              "name": "url",
+              "value": "https://en.wikipedia.org/wiki/Retrieval-augmented_generation",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fe49f814-8522-47f7-a953-8dddf44ef5eb",
+      "name": "Set page",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        780,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "Scraping",
+        "operation": "scrape",
+        "url": "={{ $json.url }}",
+        "useCustomBody": true,
+        "customBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"formats\": [\"llmMarkdown\"],\n  \"onlyMainContent\": true\n}"
+      },
+      "id": "878e54a8-fa18-4f93-af57-a1a51404d084",
+      "name": "Scrape page with Ragfeed",
+      "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
+      "typeVersion": 1.1,
+      "position": [
+        1000,
+        380
+      ],
+      "credentials": {
+        "firecrawlApi": {
+          "id": "ragfeed",
+          "name": "Ragfeed (Firecrawl API)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a7ed540-51d5-451b-a6d6-b9f0b96f816e",
+              "name": "title",
+              "value": "={{ $json.data.metadata.title }}",
+              "type": "string"
+            },
+            {
+              "id": "7470c3d1-5751-47ee-a717-c9b31347577f",
+              "name": "text",
+              "value": "={{ $json.data.llmMarkdown }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8974125f-b835-44c8-b515-2901f0085b0f",
+      "name": "Prepare text for the LLM",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1220,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Scrape web pages to LLM-ready Markdown with the Firecrawl node and Ragfeed\n\n### Who it's for\nn8n users who use the Firecrawl node and want a Firecrawl-compatible API hosted in Germany, or the compact `llmMarkdown` format for LLM steps.\n\n### How it works\n1. **Set page** holds the URL.\n2. **Scrape page with Ragfeed** is the official Firecrawl node with a Ragfeed credential. A custom body asks for `llmMarkdown`: the main content, cleaned for language models, with title, URL and fetch time in a short header.\n3. **Prepare text for the LLM** keeps title and text, ready for an OpenAI, Anthropic or Mistral node.\n\n### Requirements\n- The community node **Firecrawl** (`@mendable/n8n-nodes-firecrawl`). Self-hosted n8n only: install it via *Settings > Community Nodes*.\n- A Ragfeed API key (starts with `sk-`). Free plan: 1,000 credits a month, 1 credit per page. Sign-up and dashboard are in German: https://ragfeed.de/en\n\n### How to customize\nSwap `llmMarkdown` for `markdown` to get the standard Firecrawl format. Existing Firecrawl workflows switch to Ragfeed by changing only the credential.",
+        "height": 900,
+        "width": 520,
+        "color": 1
+      },
+      "id": "3e09a4f6-dd5c-413c-b137-3260af21e717",
+      "name": "Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Setup\n1. Install the Firecrawl community node (*Settings > Community Nodes*, package `@mendable/n8n-nodes-firecrawl`).\n2. Create a credential **Firecrawl API**:\n   - **Base URL:** `https://api.ragfeed.de/v2`\n   - **API Key:** your Ragfeed key (`sk-...`)\n   The credential test passes against Ragfeed.\n3. Put your page into **Set page** and run the workflow.",
+        "height": 320,
+        "width": 440,
+        "color": 7
+      },
+      "id": "7c24ea2d-b42d-4fda-9690-8782f006daa1",
+      "name": "Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        560,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### Scrape and prepare\n**Use Custom Body** is needed because the Firecrawl node does not list `llmMarkdown`. Connect your AI node after **Prepare text for the LLM**.",
+        "height": 260,
+        "width": 460,
+        "color": 7
+      },
+      "id": "84d93b80-61b5-4392-9240-c76680c4b6cd",
+      "name": "Scrape and prepare",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        960,
+        280
+      ]
+    }
+  ],
+  "connections": {
+    "Run manually": {
+      "main": [
+        [
+          {
+            "node": "Set page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set page": {
+      "main": [
+        [
+          {
+            "node": "Scrape page with Ragfeed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape page with Ragfeed": {
+      "main": [
+        [
+          {
+            "node": "Prepare text for the LLM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
