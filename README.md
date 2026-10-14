@@ -10,6 +10,7 @@ Kleine, nachprüfbare Beispiele für [Ragfeed](https://ragfeed.de), eine Firecra
 |---|---|
 | [`token-messung/`](token-messung) | Wie viele Tokens eine Webseite ein Sprachmodell kostet: rohes HTML, ganze Seite als Text, Hauptinhalt, llmMarkdown. Skript, Seitenliste und Ergebnis vom 01.10.2026. |
 | [`firecrawl-py/`](firecrawl-py) | Bestehender Code mit dem offiziellen Python-SDK von Firecrawl, nur `api_url` und Schlüssel ausgetauscht; dazu die Ragfeed-Formate `llmMarkdown` und `chunks`. |
+| [`n8n/`](n8n) | Zwei n8n-Workflows zum Importieren: der offizielle Firecrawl-Baustein mit Ragfeed (nur Base URL und Schlüssel ändern) und Webseite → Chunks für die Vektordatenbank. |
 
 ## Token-Messung
 

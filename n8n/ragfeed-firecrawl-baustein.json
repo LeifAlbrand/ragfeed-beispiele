@@ -1,0 +1,107 @@
+{
+  "name": "Ragfeed: Webseite als LLM-Markdown (Firecrawl-Baustein)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "6b0f2c64-1f5e-4a7b-9a51-0d2f4c1e7a01",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1a9d1e2-3b4c-4d5e-8f60-718293a4b5c6",
+              "name": "url",
+              "value": "https://de.wikipedia.org/wiki/Retrieval-Augmented_Generation",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b0f2c64-1f5e-4a7b-9a51-0d2f4c1e7a02",
+      "name": "Adresse",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "resource": "Scraping",
+        "operation": "scrape",
+        "url": "={{ $json.url }}",
+        "useCustomBody": true,
+        "customBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"formats\": [\"llmMarkdown\"],\n  \"onlyMainContent\": true\n}"
+      },
+      "id": "6b0f2c64-1f5e-4a7b-9a51-0d2f4c1e7a03",
+      "name": "Ragfeed: Seite abrufen",
+      "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
+      "typeVersion": 1.1,
+      "position": [440, 0],
+      "credentials": {
+        "firecrawlApi": {
+          "id": "ragfeed",
+          "name": "Ragfeed"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d2b8e3f4-5a6b-4c7d-9e80-91a2b3c4d5e6",
+              "name": "titel",
+              "value": "={{ $json.data.metadata.title }}",
+              "type": "string"
+            },
+            {
+              "id": "e3c9f405-6b7c-4d8e-8f91-a2b3c4d5e6f7",
+              "name": "text",
+              "value": "={{ $json.data.llmMarkdown }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b0f2c64-1f5e-4a7b-9a51-0d2f4c1e7a04",
+      "name": "Text für das Sprachmodell",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "content": "## Ragfeed im Firecrawl-Baustein\n\nRagfeed versteht die Firecrawl-API. Der offizielle Firecrawl-Baustein funktioniert deshalb unverändert, nur mit anderen Zugangsdaten:\n\n1. Baustein installieren: **Firecrawl** (`@mendable/n8n-nodes-firecrawl`, bei selbst betriebenem n8n über *Settings → Community Nodes*).\n2. Zugangsdaten **Firecrawl API** anlegen:\n   - **Base URL:** `https://api.ragfeed.de/v2`\n   - **API Key:** Ihr Ragfeed-Schlüssel (`sk-…`) aus dem Dashboard auf ragfeed.de\n3. In **Adresse** die gewünschte Webseite eintragen und den Workflow starten.\n\n`llmMarkdown` ist der Hauptinhalt der Seite, bereinigt für Sprachmodelle, mit Titel, Adresse und Abrufdatum im Kopf. Alternativ `markdown` für das normale Firecrawl-Format.\n\nDas Ergebnis aus **Text für das Sprachmodell** können Sie direkt an einen KI-Baustein (OpenAI, Anthropic, Mistral …) weitergeben.",
+        "height": 460,
+        "width": 520,
+        "color": 7
+      },
+      "id": "6b0f2c64-1f5e-4a7b-9a51-0d2f4c1e7a05",
+      "name": "Anleitung",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 180]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [[{ "node": "Adresse", "type": "main", "index": 0 }]]
+    },
+    "Adresse": {
+      "main": [[{ "node": "Ragfeed: Seite abrufen", "type": "main", "index": 0 }]]
+    },
+    "Ragfeed: Seite abrufen": {
+      "main": [[{ "node": "Text für das Sprachmodell", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

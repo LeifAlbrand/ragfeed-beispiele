@@ -1,0 +1,95 @@
+{
+  "name": "Ragfeed: Webseite als Chunks für die Vektordatenbank",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "8c1e3d75-2a6f-4b8c-8b62-1e3f5d2f8b01",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f4da0516-7c8d-4e9f-9a02-b3c4d5e6f708",
+              "name": "url",
+              "value": "https://de.wikipedia.org/wiki/Retrieval-Augmented_Generation",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8c1e3d75-2a6f-4b8c-8b62-1e3f5d2f8b02",
+      "name": "Adresse",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ragfeed.de/v2/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"formats\": [\n    { \"type\": \"chunks\", \"maxTokens\": 500 }\n  ]\n}",
+        "options": {}
+      },
+      "id": "8c1e3d75-2a6f-4b8c-8b62-1e3f5d2f8b03",
+      "name": "Ragfeed: Seite in Chunks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ragfeed-header",
+          "name": "Ragfeed (Header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.chunks",
+        "options": {}
+      },
+      "id": "8c1e3d75-2a6f-4b8c-8b62-1e3f5d2f8b04",
+      "name": "Ein Eintrag pro Chunk",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "content": "## Webseite → Chunks für die Vektordatenbank\n\nRagfeed zerlegt die Seite entlang der Überschriften in fertige Datensätze. Jeder Chunk hat:\n- `id`: feste UUID aus Adresse + Position. Bei erneutem Abruf derselben Seite bekommt der Chunk an derselben Position dieselbe ID. So überschreiben Sie Einträge, statt Dubletten anzulegen.\n- `text` und `embedText` (Text mit Überschriftenpfad, zum Einbetten)\n- `metadata`: Adresse, Titel, Überschrift, Sprache, Abrufdatum, `hash` (ändert sich nur, wenn sich der Inhalt ändert)\n\n**Einrichten:** Zugangsdaten **Header Auth** anlegen:\n- **Name:** `Authorization`\n- **Value:** `Bearer ` + Ihr Ragfeed-Schlüssel (`sk-…`)\n\nDanach **Ein Eintrag pro Chunk** mit Ihrem Embedding- und Vektordatenbank-Baustein verbinden (z. B. Qdrant, Pinecone, Postgres/pgvector). `maxTokens` (100 bis 4000, Standard 500) bestimmt die Chunk-Größe.",
+        "height": 500,
+        "width": 560,
+        "color": 7
+      },
+      "id": "8c1e3d75-2a6f-4b8c-8b62-1e3f5d2f8b05",
+      "name": "Anleitung",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 180]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [[{ "node": "Adresse", "type": "main", "index": 0 }]]
+    },
+    "Adresse": {
+      "main": [[{ "node": "Ragfeed: Seite in Chunks", "type": "main", "index": 0 }]]
+    },
+    "Ragfeed: Seite in Chunks": {
+      "main": [[{ "node": "Ein Eintrag pro Chunk", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}
