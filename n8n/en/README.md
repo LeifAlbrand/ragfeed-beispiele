@@ -7,6 +7,8 @@ Two workflows to import. In n8n: *Workflow → ⋯ → Import from File* (or pas
 | [`ragfeed-chunks-vector-db.json`](ragfeed-chunks-vector-db.json) | Web page → ready chunks, one n8n item per chunk, for a vector database | built-in nodes only (HTTP Request) |
 | [`ragfeed-firecrawl-node.json`](ragfeed-firecrawl-node.json) | Web page → `llmMarkdown` (main content, cleaned for language models) | Firecrawl community node (self-hosted n8n) |
 
+The chunks template is also on the [official n8n gallery](https://n8n.io/workflows/20948-split-web-pages-into-vector-ready-chunks-with-ragfeed/) for one-click import.
+
 ## Chunks for a vector database
 
 The HTTP Request node calls `POST https://api.ragfeed.de/v2/scrape` with the format `chunks`; **Split Out** makes one item per chunk.

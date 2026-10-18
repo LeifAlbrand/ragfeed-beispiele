@@ -7,6 +7,8 @@ Zwei Workflows zum Importieren. In n8n: *Workflow → ⋯ → Import from File* 
 | [`ragfeed-firecrawl-baustein.json`](ragfeed-firecrawl-baustein.json) | Webseite → `llmMarkdown` (Hauptinhalt, bereinigt für Sprachmodelle) | Firecrawl-Baustein |
 | [`ragfeed-chunks-vektordatenbank.json`](ragfeed-chunks-vektordatenbank.json) | Webseite → fertige Chunks, ein n8n-Eintrag pro Chunk, bereit für eine Vektordatenbank | nur Bordmittel (HTTP Request) |
 
+Die Chunks-Vorlage gibt es auch in der [offiziellen n8n-Galerie](https://n8n.io/workflows/20948-split-web-pages-into-vector-ready-chunks-with-ragfeed/) zum Import mit einem Klick.
+
 ## 1. Mit dem Firecrawl-Baustein
 
 Ragfeed versteht die Firecrawl-API (v1 und v2). Der offizielle Firecrawl-Baustein ([`@mendable/n8n-nodes-firecrawl`](https://www.npmjs.com/package/@mendable/n8n-nodes-firecrawl)) funktioniert deshalb unverändert, nur mit anderen Zugangsdaten:
