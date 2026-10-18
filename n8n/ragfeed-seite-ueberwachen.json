@@ -1,0 +1,147 @@
+{
+  "name": "Ragfeed: Webseite überwachen und bei Änderung melden",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "days", "triggerAtHour": 8 }]
+        }
+      },
+      "id": "a1b2c3d4-0001-4a10-9b01-0f1e2d3c4b01",
+      "name": "Täglich prüfen",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-0001-4a10-9b01-0f1e2d3c4b02",
+              "name": "url",
+              "value": "https://www.gesetze-im-internet.de/bdsg_2018/",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-4a10-9b01-0f1e2d3c4b03",
+      "name": "Adresse",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ragfeed.de/v2/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"formats\": [\n    \"markdown\",\n    { \"type\": \"changeTracking\", \"modes\": [\"git-diff\"] }\n  ]\n}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-4a10-9b01-0f1e2d3c4b04",
+      "name": "Ragfeed: Seite prüfen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ragfeed-header",
+          "name": "Ragfeed (Header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "loose" },
+          "conditions": [
+            {
+              "id": "a1b2c3d4-0001-4a10-9b01-0f1e2d3c4b05",
+              "leftValue": "={{ $json.data.changeTracking.changeStatus }}",
+              "rightValue": "changed",
+              "operator": { "type": "string", "operation": "equals" }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-4a10-9b01-0f1e2d3c4b06",
+      "name": "Hat sich geändert?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-0001-4a10-9b01-0f1e2d3c4b07",
+              "name": "nachricht",
+              "value": "=Die Seite {{ $('Adresse').item.json.url }} hat sich geändert.\n\n{{ $json.data.changeTracking.diff }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0001-4a10-9b01-0f1e2d3c4b08",
+      "name": "Nachricht bauen",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [880, -80]
+    },
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-0001-4a10-9b01-0f1e2d3c4b09",
+      "name": "Hier benachrichtigen (Slack/E-Mail/Webhook)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1100, -80]
+    },
+    {
+      "parameters": {
+        "content": "## Webseite überwachen, nur bei Änderung melden\n\nDer Zeitplan ruft die Seite ab und lässt Ragfeed vergleichen, ob sie sich seit dem letzten Mal geändert hat. Der Vorzustand wird **bei Ragfeed** gespeichert, nicht in n8n, deshalb läuft das in jeder Installation.\n\nIm Feld `data.changeTracking.changeStatus` steht `new` (erstes Mal), `same` (unverändert) oder `changed`. Nur bei `changed` geht es weiter; `data.changeTracking.diff` enthält die geänderten Zeilen.\n\n**Einrichten:**\n1. Zugangsdaten **Header Auth**: Name `Authorization`, Value `Bearer ` + Ihr Ragfeed-Schlüssel (`sk-…`).\n2. In **Adresse** die zu überwachende Seite eintragen (z. B. eine Gesetzes- oder Behördenseite).\n3. **Hier benachrichtigen** durch Ihren Kanal ersetzen: Slack, E-Mail, Telegram oder einen Webhook.\n\nKosten: 1 Credit je Prüfung, kein KI-Format nötig. Tipp: eigene Seiten über `tag` trennen, wenn Sie dieselbe URL mehrfach überwachen.",
+        "height": 520,
+        "width": 580,
+        "color": 7
+      },
+      "id": "a1b2c3d4-0001-4a10-9b01-0f1e2d3c4b10",
+      "name": "Anleitung",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 180]
+    }
+  ],
+  "connections": {
+    "Täglich prüfen": {
+      "main": [[{ "node": "Adresse", "type": "main", "index": 0 }]]
+    },
+    "Adresse": {
+      "main": [[{ "node": "Ragfeed: Seite prüfen", "type": "main", "index": 0 }]]
+    },
+    "Ragfeed: Seite prüfen": {
+      "main": [[{ "node": "Hat sich geändert?", "type": "main", "index": 0 }]]
+    },
+    "Hat sich geändert?": {
+      "main": [
+        [{ "node": "Nachricht bauen", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "Nachricht bauen": {
+      "main": [[{ "node": "Hier benachrichtigen (Slack/E-Mail/Webhook)", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

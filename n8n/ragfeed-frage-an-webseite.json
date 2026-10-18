@@ -1,0 +1,110 @@
+{
+  "name": "Ragfeed: Frage an eine Webseite beantworten",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e5f60718-0005-4a50-9b05-4f5e6d7c8b01",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e5f60718-0005-4a50-9b05-4f5e6d7c8b02",
+              "name": "url",
+              "value": "https://de.wikipedia.org/wiki/Retrieval-Augmented_Generation",
+              "type": "string"
+            },
+            {
+              "id": "e5f60718-0005-4a50-9b05-4f5e6d7c8b03",
+              "name": "frage",
+              "value": "Was sind die Hauptvorteile von Retrieval-Augmented Generation?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5f60718-0005-4a50-9b05-4f5e6d7c8b04",
+      "name": "Seite und Frage",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ragfeed.de/v2/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"formats\": [\n    { \"type\": \"question\", \"question\": \"{{ $json.frage }}\" }\n  ]\n}",
+        "options": {}
+      },
+      "id": "e5f60718-0005-4a50-9b05-4f5e6d7c8b05",
+      "name": "Ragfeed: Frage stellen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ragfeed-header",
+          "name": "Ragfeed (Header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e5f60718-0005-4a50-9b05-4f5e6d7c8b06",
+              "name": "antwort",
+              "value": "={{ $json.data.answer }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5f60718-0005-4a50-9b05-4f5e6d7c8b07",
+      "name": "Antwort",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "content": "## Eine Frage zu einer Webseite beantworten\n\nRagfeed liest die Seite und beantwortet Ihre Frage nur aus deren Inhalt. Die Antwort steht in `data.answer`.\n\n**Anpassen:** In **Seite und Frage** die Adresse und die Frage eintragen. Beide können auch aus einem vorigen Schritt kommen (z. B. ein Formular oder ein Chat-Trigger), dann verweisen Sie im Baustein auf dessen Felder.\n\n**Einrichten:** Zugangsdaten **Header Auth**: Name `Authorization`, Value `Bearer ` + Ihr Ragfeed-Schlüssel (`sk-…`).\n\nKosten: 1 Credit für die Seite + 5 Credits für das KI-Format `question`.",
+        "height": 440,
+        "width": 560,
+        "color": 7
+      },
+      "id": "e5f60718-0005-4a50-9b05-4f5e6d7c8b08",
+      "name": "Anleitung",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 180]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [[{ "node": "Seite und Frage", "type": "main", "index": 0 }]]
+    },
+    "Seite und Frage": {
+      "main": [[{ "node": "Ragfeed: Frage stellen", "type": "main", "index": 0 }]]
+    },
+    "Ragfeed: Frage stellen": {
+      "main": [[{ "node": "Antwort", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

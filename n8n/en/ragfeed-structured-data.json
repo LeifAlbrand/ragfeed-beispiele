@@ -1,0 +1,104 @@
+{
+  "name": "Ragfeed: Structured data from a web page (JSON schema)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "d4e5f607-0004-4a40-9b04-3f4e5d6c7b01",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d4e5f607-0004-4a40-9b04-3f4e5d6c7b02",
+              "name": "url",
+              "value": "https://en.wikipedia.org/wiki/Retrieval-augmented_generation",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d4e5f607-0004-4a40-9b04-3f4e5d6c7b03",
+      "name": "URL",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ragfeed.de/v2/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"formats\": [\n    {\n      \"type\": \"json\",\n      \"prompt\": \"Extract the title, a short summary and the three main points of the page.\",\n      \"schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"title\": { \"type\": \"string\" },\n          \"summary\": { \"type\": \"string\" },\n          \"keyPoints\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } }\n        },\n        \"required\": [\"title\", \"summary\"]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "d4e5f607-0004-4a40-9b04-3f4e5d6c7b04",
+      "name": "Ragfeed: extract structured",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ragfeed-header",
+          "name": "Ragfeed (Header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d4e5f607-0004-4a40-9b04-3f4e5d6c7b05",
+              "name": "data",
+              "value": "={{ $json.data.json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d4e5f607-0004-4a40-9b04-3f4e5d6c7b06",
+      "name": "Take fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "content": "## Structured data from a web page\n\nRagfeed reads the page and fills the fields you define in `schema`. The result is in `data.json` as a ready object you can pass straight on (to a database, a CRM, a sheet …).\n\n**Adapt:** change `prompt` and `schema` in **Ragfeed: extract structured** to your fields, e.g. company name, industry, location, contact for lead enrichment, or product name, price, availability.\n\n**Setup:** Credential **Header Auth**: Name `Authorization`, Value `Bearer ` + your Ragfeed key (`sk-…`).\n\nCost: 1 credit for the page + 5 credits for the `json` AI format. Failed pages cost nothing.",
+        "height": 460,
+        "width": 560,
+        "color": 7
+      },
+      "id": "d4e5f607-0004-4a40-9b04-3f4e5d6c7b07",
+      "name": "Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 180]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [[{ "node": "URL", "type": "main", "index": 0 }]]
+    },
+    "URL": {
+      "main": [[{ "node": "Ragfeed: extract structured", "type": "main", "index": 0 }]]
+    },
+    "Ragfeed: extract structured": {
+      "main": [[{ "node": "Take fields", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

@@ -1,0 +1,104 @@
+{
+  "name": "Ragfeed: Strukturierte Daten aus einer Webseite (JSON-Schema)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c3d4e5f6-0003-4a30-9b03-2f3e4d5c6b01",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c3d4e5f6-0003-4a30-9b03-2f3e4d5c6b02",
+              "name": "url",
+              "value": "https://de.wikipedia.org/wiki/Retrieval-Augmented_Generation",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-0003-4a30-9b03-2f3e4d5c6b03",
+      "name": "Adresse",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ragfeed.de/v2/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"formats\": [\n    {\n      \"type\": \"json\",\n      \"prompt\": \"Extrahiere Titel, eine kurze Zusammenfassung und die drei wichtigsten Punkte der Seite.\",\n      \"schema\": {\n        \"type\": \"object\",\n        \"properties\": {\n          \"titel\": { \"type\": \"string\" },\n          \"zusammenfassung\": { \"type\": \"string\" },\n          \"kernpunkte\": { \"type\": \"array\", \"items\": { \"type\": \"string\" } }\n        },\n        \"required\": [\"titel\", \"zusammenfassung\"]\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "id": "c3d4e5f6-0003-4a30-9b03-2f3e4d5c6b04",
+      "name": "Ragfeed: strukturiert auslesen",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ragfeed-header",
+          "name": "Ragfeed (Header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c3d4e5f6-0003-4a30-9b03-2f3e4d5c6b05",
+              "name": "daten",
+              "value": "={{ $json.data.json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-0003-4a30-9b03-2f3e4d5c6b06",
+      "name": "Felder übernehmen",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "content": "## Strukturierte Daten aus einer Webseite\n\nRagfeed liest die Seite und füllt die Felder, die Sie im `schema` vorgeben. Das Ergebnis steht in `data.json` als fertiges Objekt, das Sie direkt weiterverarbeiten können (in eine Datenbank, ein CRM, ein Sheet …).\n\n**Anpassen:** Ändern Sie `prompt` und `schema` im Baustein **Ragfeed: strukturiert auslesen** auf Ihre Felder, etwa Firmenname, Branche, Ort, Kontakt für die Lead-Anreicherung, oder Produktname, Preis, Verfügbarkeit.\n\n**Einrichten:** Zugangsdaten **Header Auth**: Name `Authorization`, Value `Bearer ` + Ihr Ragfeed-Schlüssel (`sk-…`).\n\nKosten: 1 Credit für die Seite + 5 Credits für das KI-Format `json`. Fehlgeschlagene Seiten kosten nichts.",
+        "height": 460,
+        "width": 560,
+        "color": 7
+      },
+      "id": "c3d4e5f6-0003-4a30-9b03-2f3e4d5c6b07",
+      "name": "Anleitung",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 180]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [[{ "node": "Adresse", "type": "main", "index": 0 }]]
+    },
+    "Adresse": {
+      "main": [[{ "node": "Ragfeed: strukturiert auslesen", "type": "main", "index": 0 }]]
+    },
+    "Ragfeed: strukturiert auslesen": {
+      "main": [[{ "node": "Felder übernehmen", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

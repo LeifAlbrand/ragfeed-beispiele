@@ -1,0 +1,174 @@
+{
+  "name": "Ragfeed: RAG pipeline – web page to chunks, embeddings, Qdrant",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b01",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b02",
+              "name": "url",
+              "value": "https://en.wikipedia.org/wiki/Retrieval-augmented_generation",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b03",
+      "name": "URL",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.ragfeed.de/v2/scrape",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.url }}\",\n  \"formats\": [\n    { \"type\": \"chunks\", \"maxTokens\": 500 }\n  ]\n}",
+        "options": {}
+      },
+      "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b04",
+      "name": "Ragfeed: page to chunks",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [440, 0],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "ragfeed-header",
+          "name": "Ragfeed (Header)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.chunks",
+        "options": {}
+      },
+      "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b05",
+      "name": "One item per chunk",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [660, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/embeddings",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"model\": \"text-embedding-3-small\", \"input\": $json.embedText } }}",
+        "options": {}
+      },
+      "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b06",
+      "name": "Create embedding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [880, 0],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai",
+          "name": "OpenAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b07",
+              "name": "id",
+              "value": "={{ $('One item per chunk').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b08",
+              "name": "vector",
+              "value": "={{ $json.data[0].embedding }}",
+              "type": "array"
+            },
+            {
+              "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b09",
+              "name": "payload",
+              "value": "={{ { \"text\": $('One item per chunk').item.json.text, \"heading\": $('One item per chunk').item.json.heading, \"metadata\": $('One item per chunk').item.json.metadata } }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b0a",
+      "name": "Build Qdrant point",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [1100, 0]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "https://YOUR-QDRANT-HOST:6333/collections/ragfeed/points?wait=true",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { \"points\": [ { \"id\": $json.id, \"vector\": $json.vector, \"payload\": $json.payload } ] } }}",
+        "options": {}
+      },
+      "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b0b",
+      "name": "Store in Qdrant",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 0]
+    },
+    {
+      "parameters": {
+        "content": "## A full RAG pipeline, HTTP nodes only\n\nWeb page → ready chunks (Ragfeed) → embedding (OpenAI) → vector store (Qdrant). Built-in nodes only, no extra packages.\n\n**Why it stays duplicate-free:** each chunk's `id` is a stable UUID from the URL and position. It becomes the Qdrant point id directly. Re-fetch the same page and Qdrant overwrites the same point instead of adding a second one.\n\n**Setup:**\n1. **Header Auth** for Ragfeed: Name `Authorization`, Value `Bearer ` + your key (`sk-…`).\n2. **OpenAI** credential in *Create embedding*.\n3. In *Store in Qdrant* set `YOUR-QDRANT-HOST` and the collection `ragfeed`. On Qdrant Cloud add an `api-key` header.\n\n**Important:** the embedding model's dimension must match the Qdrant collection (`text-embedding-3-small` = 1536). Create the collection with that size first.\n\nRagfeed cost: 1 credit per page, chunks cost nothing extra.",
+        "height": 560,
+        "width": 620,
+        "color": 7
+      },
+      "id": "182a3b4c-0008-4a80-9b08-7f8e9d0c1b0c",
+      "name": "Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [0, 180]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [[{ "node": "URL", "type": "main", "index": 0 }]]
+    },
+    "URL": {
+      "main": [[{ "node": "Ragfeed: page to chunks", "type": "main", "index": 0 }]]
+    },
+    "Ragfeed: page to chunks": {
+      "main": [[{ "node": "One item per chunk", "type": "main", "index": 0 }]]
+    },
+    "One item per chunk": {
+      "main": [[{ "node": "Create embedding", "type": "main", "index": 0 }]]
+    },
+    "Create embedding": {
+      "main": [[{ "node": "Build Qdrant point", "type": "main", "index": 0 }]]
+    },
+    "Build Qdrant point": {
+      "main": [[{ "node": "Store in Qdrant", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

@@ -6,6 +6,10 @@ Zwei Workflows zum Importieren. In n8n: *Workflow → ⋯ → Import from File* 
 |---|---|---|
 | [`ragfeed-firecrawl-baustein.json`](ragfeed-firecrawl-baustein.json) | Webseite → `llmMarkdown` (Hauptinhalt, bereinigt für Sprachmodelle) | Firecrawl-Baustein |
 | [`ragfeed-chunks-vektordatenbank.json`](ragfeed-chunks-vektordatenbank.json) | Webseite → fertige Chunks, ein n8n-Eintrag pro Chunk, bereit für eine Vektordatenbank | nur Bordmittel (HTTP Request) |
+| [`ragfeed-seite-ueberwachen.json`](ragfeed-seite-ueberwachen.json) | Seite nach Zeitplan prüfen, nur bei Änderung melden | nur Bordmittel (`changeTracking`) |
+| [`ragfeed-strukturierte-daten.json`](ragfeed-strukturierte-daten.json) | Seite → feste Felder nach Ihrem JSON-Schema | nur Bordmittel (KI-Format `json`) |
+| [`ragfeed-frage-an-webseite.json`](ragfeed-frage-an-webseite.json) | Seite → Antwort auf eine Frage | nur Bordmittel (KI-Format `question`) |
+| [`ragfeed-rag-pipeline-qdrant.json`](ragfeed-rag-pipeline-qdrant.json) | Seite → Chunks → Embeddings → Qdrant (Ende-zu-Ende) | OpenAI + Qdrant |
 
 Die Chunks-Vorlage gibt es auch in der [offiziellen n8n-Galerie](https://n8n.io/workflows/20948-split-web-pages-into-vector-ready-chunks-with-ragfeed/) zum Import mit einem Klick.
 
