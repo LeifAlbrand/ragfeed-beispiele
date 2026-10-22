@@ -18,7 +18,7 @@ Die Chunks-Vorlage gibt es auch in der [offiziellen n8n-Galerie](https://n8n.io/
 Ragfeed versteht die Firecrawl-API (v1 und v2). Der offizielle Firecrawl-Baustein ([`@mendable/n8n-nodes-firecrawl`](https://www.npmjs.com/package/@mendable/n8n-nodes-firecrawl)) funktioniert deshalb unverändert, nur mit anderen Zugangsdaten:
 
 1. Baustein **Firecrawl** hinzufügen. Bei selbst betriebenem n8n vorher unter *Settings → Community Nodes* installieren.
-2. Zugangsdaten **Firecrawl API** anlegen:
+2. Zugangsdaten **Firecrawl API** anlegen. In n8n Cloud ist **Gateway credits** vorausgewählt, das ruft Firecrawl selbst auf; wählen Sie stattdessen **Create new credential**:
    - **Base URL:** `https://api.ragfeed.de/v2`
    - **API Key:** Ihr Ragfeed-Schlüssel (`sk-…`) aus dem Dashboard auf [ragfeed.de](https://ragfeed.de)
 3. Fertig. Der Verbindungstest des Bausteins läuft gegen Ragfeed durch.

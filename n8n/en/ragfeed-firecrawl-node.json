@@ -105,7 +105,7 @@
     },
     {
       "parameters": {
-        "content": "## Setup\n1. Install the Firecrawl community node (*Settings > Community Nodes*, package `@mendable/n8n-nodes-firecrawl`).\n2. Create a credential **Firecrawl API**:\n   - **Base URL:** `https://api.ragfeed.de/v2`\n   - **API Key:** your Ragfeed key (`sk-...`)\n   The credential test passes against Ragfeed.\n3. Put your page into **Set page** and run the workflow.",
+        "content": "## Setup\n1. Install the Firecrawl community node (*Settings > Community Nodes*, package `@mendable/n8n-nodes-firecrawl`).\n2. Create a credential **Firecrawl API** (on n8n Cloud the node preselects **Gateway credits**, which calls Firecrawl itself: pick **Create new credential** instead):\n   - **Base URL:** `https://api.ragfeed.de/v2`\n   - **API Key:** your Ragfeed key (`sk-...`)\n   The credential test passes against Ragfeed.\n3. Put your page into **Set page** and run the workflow.",
         "height": 320,
         "width": 440,
         "color": 7

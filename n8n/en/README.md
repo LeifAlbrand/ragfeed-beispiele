@@ -34,7 +34,7 @@ Each chunk has:
 Ragfeed speaks the Firecrawl API (v1 and v2), so the official Firecrawl node ([`@mendable/n8n-nodes-firecrawl`](https://www.npmjs.com/package/@mendable/n8n-nodes-firecrawl)) works unchanged with a different credential:
 
 1. Install the node on self-hosted n8n via *Settings → Community Nodes*.
-2. Create a credential **Firecrawl API**:
+2. Create a credential **Firecrawl API**. On n8n Cloud the node preselects **Gateway credits**, which calls Firecrawl itself; pick **Create new credential** instead:
    - **Base URL:** `https://api.ragfeed.de/v2`
    - **API Key:** your Ragfeed key (`sk-…`)
 3. Done. The node's credential test passes against Ragfeed.
