@@ -46,7 +46,7 @@
       "id": "878e54a8-fa18-4f93-af57-a1a51404d084",
       "name": "Scrape page with Ragfeed",
       "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
-      "typeVersion": 1.1,
+      "typeVersion": 1,
       "position": [
         1000,
         380

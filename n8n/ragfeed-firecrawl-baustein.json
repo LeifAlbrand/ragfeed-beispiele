@@ -40,7 +40,7 @@
       "id": "6b0f2c64-1f5e-4a7b-9a51-0d2f4c1e7a03",
       "name": "Ragfeed: Seite abrufen",
       "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
-      "typeVersion": 1.1,
+      "typeVersion": 1,
       "position": [440, 0],
       "credentials": {
         "firecrawlApi": {
