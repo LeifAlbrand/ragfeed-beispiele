@@ -1,14 +1,15 @@
 """Call Ragfeed as an A2A agent with the official a2a-sdk, the way another agent would.
 
-Two calls:
+Three calls:
   1. fetch_clean_webdata: fetch one page (no stream), result as llmMarkdown.
   2. crawl_site: crawl a few pages and follow progress live over a stream (SSE).
+  3. The same fetch with the eu-web-data extension: Ragfeed attaches how the result came about.
 
     pip install -r requirements.txt
     export RAGFEED_API_KEY=sk-...     (PowerShell: $env:RAGFEED_API_KEY="sk-..."; cmd: set RAGFEED_API_KEY=sk-...)
     python example.py
 
-Costs about 4 credits. Prints no page content and never the key.
+Costs about 5 credits. Prints no page content and never the key.
 Get the key from the dashboard at https://ragfeed.de
 """
 import asyncio
@@ -20,13 +21,15 @@ import uuid
 import httpx
 from a2a.client import A2ACardResolver, ClientConfig, create_client
 from a2a.types import Message, Part, Role, SendMessageRequest, TaskState
-from google.protobuf.json_format import ParseDict
+from google.protobuf.json_format import MessageToDict, ParseDict
 from google.protobuf.struct_pb2 import Value
 
 # The Agent Card lives at <AGENT>/.well-known/agent-card.json and describes skills, endpoint and auth.
 AGENT = "https://ragfeed.de"
 PAGE = "https://example.com/"      # the page to fetch
 SITE = "https://ragfeed.de/en"     # start page for the small crawl
+# Data-only extension from the Agent Card: where data is processed and which site rules apply.
+EU_WEB_DATA = "https://ragfeed.de/a2a/extensions/eu-web-data/v1"
 
 
 def request(part: Part) -> SendMessageRequest:
@@ -65,6 +68,18 @@ async def stream(http: httpx.AsyncClient, card) -> None:
     await client.close()
 
 
+async def provenance(key: str, card) -> None:
+    # Send the A2A-Extensions header with the URI and every result carries provenance: live or from the cache, when
+    # fetched, robots.txt checked, where processed. Without the header nothing changes.
+    headers = {"Authorization": f"Bearer {key}", "A2A-Extensions": EU_WEB_DATA}
+    async with httpx.AsyncClient(headers=headers, timeout=90) as http:
+        client = await create_client(card, ClientConfig(httpx_client=http, streaming=False))
+        events = [event async for event in client.send_message(request(Part(text=PAGE)))]
+        await client.close()
+    artifact = events[-1].task.artifacts[0]
+    print(f"Provenance: {MessageToDict(artifact.metadata).get(EU_WEB_DATA)}")
+
+
 async def main() -> int:
     key = os.environ.get("RAGFEED_API_KEY", "").strip()
     if not key:
@@ -77,6 +92,7 @@ async def main() -> int:
               f"skills: {[s.id for s in card.skills]}")
         await fetch(http, card)
         await stream(http, card)
+    await provenance(key, card)
     return 0
 
 

@@ -6,7 +6,7 @@ The **Agent Card** is public at [`/.well-known/agent-card.json`](https://ragfeed
 
 ## Example
 
-[`example.py`](example.py) calls Ragfeed with the official `a2a-sdk`, the way another agent would: first a page fetch (`fetch_clean_webdata`), then a small crawl over a stream that prints each interim state with a timestamp.
+[`example.py`](example.py) calls Ragfeed with the official `a2a-sdk`, the way another agent would: first a page fetch (`fetch_clean_webdata`), then a small crawl over a stream that prints each interim state with a timestamp. Finally the same fetch with the `eu-web-data` extension: the result then carries provenance you can keep for your own records.
 
 ```bash
 pip install -r requirements.txt
@@ -23,15 +23,20 @@ Stream    0.1 s  task: TASK_STATE_SUBMITTED
 Stream    0.3 s  status_update: TASK_STATE_WORKING
 Stream    1.3 s  artifact_update: pages
 Stream    1.3 s  status_update: TASK_STATE_COMPLETED
+Provenance: {'fetchedFrom': 'cache', 'fetchedAt': '…', 'processedIn': 'DE', 'robotsChecked': True}
 ```
 
-Costs about 4 credits; the free plan has 1,000 per month.
+`cache` here means a fresh copy from the first fetch, never an archive. Costs about 5 credits; the free plan has 1,000 per month.
+
+## Provenance (extension `eu-web-data`)
+
+Send the header `A2A-Extensions: https://ragfeed.de/a2a/extensions/eu-web-data/v1` and every artifact carries provenance in its `metadata` under exactly that URI; in a crawl, per page. Ragfeed confirms the activation in the same response header. Without the header nothing changes. It is a self-declaration, not an audit; the [specification](https://ragfeed.de/a2a/extensions/eu-web-data/v1) explains the fields.
 
 ## Good to know
 
 - **Default skill:** a plain text part counts as `fetch_clean_webdata` with the URL as its text. You call a specific skill through a `data` part with `{"skill": "…", …}`.
 - **Protocol 1.0:** without an `A2A-Version` header the server assumes 0.3 per spec and rejects. The SDK sets the header itself.
 - **API key only**, as a Bearer token – the same one as for the REST and MCP interface.
-- **Fair to the target site:** on crawl and monitoring Ragfeed honours robots.txt and bypasses no bot protection; rejected tasks cost nothing.
+- **Fair to the target site:** on every A2A task, single fetches included, Ragfeed honours robots.txt and the site's opt-outs, serves no archive copies and bypasses no bot protection; rejected tasks cost nothing.
 
-Tested 2026-11-07 against `api.ragfeed.de` with `a2a-sdk` 1.3.0.
+Tested with `a2a-sdk` 1.3.0, last on 2026-11-08.

@@ -1,14 +1,15 @@
 """Ragfeed als A2A-Agent ansprechen – mit dem offiziellen a2a-sdk, so wie es ein anderer Agent täte.
 
-Zwei Aufrufe:
+Drei Aufrufe:
   1. fetch_clean_webdata: eine Seite abrufen (ohne Stream), Ergebnis als llmMarkdown.
   2. crawl_site: wenige Seiten crawlen und den Fortschritt live über einen Stream (SSE) verfolgen.
+  3. Derselbe Abruf mit der Extension eu-web-data: Ragfeed legt dem Ergebnis bei, wie es zustande kam.
 
     pip install -r requirements.txt
     set RAGFEED_API_KEY=sk-...        (PowerShell: $env:RAGFEED_API_KEY="sk-..."; Bash: export RAGFEED_API_KEY=sk-...)
     python beispiel.py
 
-Kostet rund 4 Credits. Gibt keinen Seiteninhalt und nie den Schlüssel aus.
+Kostet rund 5 Credits. Gibt keinen Seiteninhalt und nie den Schlüssel aus.
 Den Schlüssel gibt es im Dashboard auf https://ragfeed.de
 """
 import asyncio
@@ -20,13 +21,15 @@ import uuid
 import httpx
 from a2a.client import A2ACardResolver, ClientConfig, create_client
 from a2a.types import Message, Part, Role, SendMessageRequest, TaskState
-from google.protobuf.json_format import ParseDict
+from google.protobuf.json_format import MessageToDict, ParseDict
 from google.protobuf.struct_pb2 import Value
 
 # Die Agent Card liegt unter <AGENT>/.well-known/agent-card.json und beschreibt Fähigkeiten, Endpunkt und Auth.
 AGENT = "https://ragfeed.de"
 PAGE = "https://example.com/"      # die abzurufende Seite
 SITE = "https://ragfeed.de/en"     # Startseite für den kleinen Crawl
+# Data-only Extension aus der Agent Card: wo Daten verarbeitet werden und welche Seiten-Regeln gelten.
+EU_WEB_DATA = "https://ragfeed.de/a2a/extensions/eu-web-data/v1"
 
 
 def request(part: Part) -> SendMessageRequest:
@@ -65,6 +68,18 @@ async def stream(http: httpx.AsyncClient, card) -> None:
     await client.close()
 
 
+async def provenance(key: str, card) -> None:
+    # Wer den Header A2A-Extensions mit der URI schickt, bekommt zu jedem Ergebnis Herkunftsangaben: live oder aus dem
+    # Cache, wann abgerufen, robots.txt geprüft, wo verarbeitet. Ohne den Header ändert sich nichts.
+    headers = {"Authorization": f"Bearer {key}", "A2A-Extensions": EU_WEB_DATA}
+    async with httpx.AsyncClient(headers=headers, timeout=90) as http:
+        client = await create_client(card, ClientConfig(httpx_client=http, streaming=False))
+        events = [event async for event in client.send_message(request(Part(text=PAGE)))]
+        await client.close()
+    artifact = events[-1].task.artifacts[0]
+    print(f"Herkunft: {MessageToDict(artifact.metadata).get(EU_WEB_DATA)}")
+
+
 async def main() -> int:
     key = os.environ.get("RAGFEED_API_KEY", "").strip()
     if not key:
@@ -77,6 +92,7 @@ async def main() -> int:
               f"Skills: {[s.id for s in card.skills]}")
         await fetch(http, card)
         await stream(http, card)
+    await provenance(key, card)
     return 0
 
 
